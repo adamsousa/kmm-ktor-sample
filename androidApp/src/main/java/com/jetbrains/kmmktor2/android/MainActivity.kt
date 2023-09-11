@@ -2,15 +2,17 @@ package com.jetbrains.kmmktor2.android
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import com.jetbrains.kmmktor2.Greeting
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.jetbrains.kmmktor2.MainActivityViewModel
 import kotlinx.coroutines.*
 
 
 class MainActivity : AppCompatActivity() {
-    private val mainScope = MainScope()
-    private val greeting = Greeting()
+    private val viewModel = MainActivityViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,22 +22,16 @@ class MainActivity : AppCompatActivity() {
         tv.text = "Loading..."
 
         Toast.makeText(this, "hello", Toast.LENGTH_LONG).show()
-        mainScope.launch {
-            kotlin.runCatching {
-                greeting.greeting()
-            }.onSuccess {
-                tv.text = it
-            }.onFailure {
-                tv.text = it.localizedMessage
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.greetingFlow.collect {
+                    tv.text = it
+                    Toast.makeText(this@MainActivity, "hello2", Toast.LENGTH_LONG).show()
+                }
             }
-
-            Toast.makeText(this@MainActivity, "hello2", Toast.LENGTH_LONG).show()
         }
-    }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        mainScope.cancel()
+        viewModel.fetchGreeting()
     }
-
 }

@@ -1,6 +1,5 @@
 buildscript {
     repositories {
-        gradlePluginPortal()
         google()
         mavenCentral()
     }
@@ -14,8 +13,4 @@ allprojects {
         google()
         mavenCentral()
     }
-
-    // ./gradlew dependencyUpdates
-    // Report: build/dependencyUpdates/report.txt
-    apply(plugin = "com.github.ben-manes.versions")
 }
